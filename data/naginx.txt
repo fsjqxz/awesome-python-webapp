@@ -1,0 +1,34 @@
+naginx
+	架构：一个master进程，多个work进程，（work数量最好和cpu核数量一样）
+nginx 0.8以后：引入了一系列命令行参数 
+	./nginx -s reload
+	./nginx -s stop
+nginx如何处理请求
+	master进程先建立好需要listen的socket（listenfd）--> master进程fork出worker进程-->所有worker进程在注册listenfd读事件前抢accept_mutex --> 抢到互斥锁的那个进程注册listenfd读事件，在读事件里调用accept接受该连接
+naginx的进程模型：
+	异步非阻塞
+IO模型：
+	阻塞：等事件准备好
+	非阻塞：等待时做其它事情，然后再来看看事件好了没
+	异步非阻塞：select/poll/epoll/kqueue
+web服务器事件类型：网络事件、信号、定时器
+connection：
+	是对tcp连接的封装，其中包括连接的socket，读事件，写事件
+	worker_connectons来设置每个进程支持的最大连接数
+request:
+	这节我们讲request，在nginx中我们指的是http请求，具体到nginx中的数据结构是ngx_http_request_t
+	gx_http_request_t是对一个http请求的封装。一个http请求包含：请求行、请求头、请求体、响应行、响应头、响应体。
+如何处理一个完整的请求:
+	ngx_http_init_request开始 --> 会设置读事件为ngx_http_process_request_line(请求行) --> ngx_http_process_request_headers(读事件) --> 
+	请求行包含请求的方法，uri，版本，host
+keepalive(长连接)
+	知道每个请求头与响应体的长度，那么我们是可以在一个连接上面执行多个请求的，这就是所谓的长连接（content-length请求体长度）
+	http1.0 响应头中有content-length头，则以content-length的长度就可以知道body的长度了
+		如果没有content-length头，则客户端会一直接收数据，直到服务端主动断开连接，才表示body接收完了。	
+	http1.1 响应头中的Transfer-encoding为chunked传输，则表示body是流式输出，body会被分成多个块，每块的开始会标识出当前块的长度		如果是非chunked传输，而且有content-length，则按照content-length来接收数据。否则，如果是非chunked，并且没有content-le	ngth，则客户端接收数据，直到服务端主动断开连接。
+	http1.0默认close http1.1默认
+pipe （keepalive的升华）
+	客户端不必等到第一个请求处理完后，就可以马上发起第二个请求
+	ginx在读取数据时，会将读取的数据放到一个buffer里面，所以，如果nginx在处理完前一个请求后，如果发现buffer里面还有数据，就认为剩下的数据是下一个请求的开始，然后就接下来处理下一个请求，否则就设置keepalive。
+lingering_close（延迟关闭）
+	当nginx要关闭连接时，并非立即关闭连接，而是先关闭tcp连接的写，再等待一段时间后再关掉连接的读。

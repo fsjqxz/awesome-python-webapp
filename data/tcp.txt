@@ -1,0 +1,16 @@
+tcp连接
+服务端 ：先导入模块socket,time,threading
+		 建立一个socket  s = socke.socket(socket.AF_INET,socket.SOCK_STREAM)  （第一个参数是IPV4，第二个是TCP）
+		 打开端口，监听端口 s.bind(('127.0.0.1',9999)) s.listen(5)
+		 定义连接函数 def tcplink(sock,addr):
+		 				print "Accpect from %S:%S" %addr
+		 				sock.send("welcome")
+		 				while True:
+		 					data = sock.recv(1024)
+        					time.sleep(1)
+		 					if data == 'exit' or not data:
+		 						break
+		 					else:
+		 						sock.send("hellow %s" %data)
+		 						sleep(1)
+		 				sock.close()

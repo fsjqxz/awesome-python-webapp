@@ -1,0 +1,39 @@
+Git 
+	Git是目前世界上最先进的分布式版本控制系统
+集中式和分布式
+
+windows安装git 
+	先百度下载git安装
+	程序打开 git bash
+	$ git config --global user.name "Your Name"
+	$ git config --global user.email "email@example.com"
+
+版本库（repository）
+	成一个目录，这个目录里面的所有文件都可以被Git管理起来，每个文件的修改、删除，Git都能跟踪，以便任何时刻都可以追踪历史，或者在将来某个时刻可以“还原”。
+
+	步骤：
+		1：建立一个文件夹，mkdir hude ，cd hude ，pwd
+		2：把这个文件夹设置为Git管理仓库， git init
+		3：新建文件，readme.txt
+		4：把文件填加入仓库，git add readme.txt
+		5: 用命令git commit告诉Git，把文件提交到仓库，git commit -m "wrote a readme file"
+		   -m后面输入的是本次提交的说明，可以输入任意内容，当然最好是有意义的，这样你就能从历史记录里方便地找到改动记录
+
+	小结
+		现在总结一下今天学的两点内容：
+			初始化一个Git仓库，使用git init命令。
+		添加文件到Git仓库，分两步：
+			第一步，使用命令git add <file>，注意，可反复多次使用，添加多个文件；
+			第二步，使用命令git commit，完成。
+
+	小结
+		要随时掌握工作区的状态，使用git status命令。
+		如果git status告诉你有文件被修改过，用git diff可以查看修改内容。
+
+	小结
+		HEAD指向的版本就是当前版本，因此，Git允许我们在版本的历史之间穿梭，使用命令git reset --hard commit_id。
+		穿梭前，用git log可以查看提交历史，以便确定要回退到哪个版本。
+		要重返未来，用git reflog查看命令历史，以便确定要回到未来的哪个版本。
+
+	小结
+		现在，你又理解了Git是如何跟踪修改的，每次修改，如果不add到暂存区，那就不会加入到commit中。
